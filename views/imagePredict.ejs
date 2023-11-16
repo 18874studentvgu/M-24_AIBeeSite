@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+    <%- include('layouts/header'); -%>
+    <body>
+        <!-- Navigation-->
+        <%- include('layouts/navbar'); -%>
+        <!-- Page Header-->
+        <header class="masthead" style="background-image: url('/assets/img/contact-bg.jpg')">
+            <div class="container position-relative px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        <div class="page-heading">
+                            <h1>Bee Image Predictions</h1>
+                            <span class="subheading">Have questions? I have answers.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <!-- Main Content-->
+        <main class="mb-4">
+        <% if (!!Object.keys(response).length) { %>
+        <div class="container px-4 px-lg-5">
+          <div class="row gx-4 gx-lg-5 justify-content-center">
+              <div class="col-md-10 col-lg-8 col-xl-7">
+                        <p>Buzzz Buzzz!</p>
+                        <img src="/upload/<%= encodeURIComponent(response.img) %>" style="max-width:100%">
+                        <p><%= response.msg%></p>
+                        <div class="my-5">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <% } %>
+            <div class="container px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        <p>Want see bee? upload bee!</p>
+                        <div class="my-5">
+                            <!-- * * * * * * * * * * * * * * *-->
+                            <!-- * * SB Forms Contact Form * *-->
+                            <!-- * * * * * * * * * * * * * * *-->
+                            <!-- This form is pre-integrated with SB Forms.-->
+                            <!-- To make this form functional, sign up at-->
+                            <!-- https://startbootstrap.com/solution/contact-forms-->
+                            <!-- to get an API token!-->
+                            <form id="imageSubmission" action="/image/store" method="POST" enctype="multipart/form-data">
+<!--                                <div class="form-floating">-->
+<!--                                    <input class="form-control" id="name" type="text" placeholder="Enter your name..." data-sb-validations="required" />-->
+<!--                                    <label for="name">Name</label>-->
+<!--                                    <div class="invalid-feedback" data-sb-feedback="name:required">A name is required.</div>-->
+<!--                                </div>-->
+<!--                                <div class="form-floating">-->
+<!--                                    <input class="form-control" id="email" type="email" placeholder="Enter your email..." data-sb-validations="required,email" />-->
+<!--                                    <label for="email">Email address</label>-->
+<!--                                    <div class="invalid-feedback" data-sb-feedback="email:required">An email is required.</div>-->
+<!--                                    <div class="invalid-feedback" data-sb-feedback="email:email">Email is not valid.</div>-->
+<!--                                </div>-->
+<!--                                <div class="form-floating">-->
+<!--                                    <input class="form-control" id="phone" type="tel" placeholder="Enter your phone number..." data-sb-validations="required" />-->
+<!--                                    <label for="phone">Phone Number</label>-->
+<!--                                    <div class="invalid-feedback" data-sb-feedback="phone:required">A phone number is required.</div>-->
+<!--                                </div>-->
+<!--                                <div class="form-floating">-->
+<!--                                    <textarea class="form-control" id="message" placeholder="Enter your message here..." style="height: 12rem" data-sb-validations="required"></textarea>-->
+<!--                                    <label for="message">Message</label>-->
+<!--                                    <div class="invalid-feedback" data-sb-feedback="message:required">A message is required.</div>-->
+<!--                                </div>-->
+                                <div class="form-group floating-label-form-group control-group controls">
+                                    <label>Image</label>
+                                    <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                                </div>
+                                <br />
+                                <!-- Submit Button-->
+                                <button class="btn btn-primary text-uppercase" id="submitButton" type="submit">Send</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <!-- Footer-->
+        <%- include('layouts/footer'); -%>
+        <%- include('layouts/scripts'); -%>
+        <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *-->
+        <!-- * *                               SB Forms JS                               * *-->
+        <!-- * * Activate your form at https://startbootstrap.com/solution/contact-forms * *-->
+        <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *-->
+<!--        <script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>-->
+    </body>
+</html>
