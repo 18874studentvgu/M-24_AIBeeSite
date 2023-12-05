@@ -10766,6 +10766,19 @@ header.masthead .post-heading .meta a {
   text-align: center;
 }
 
+.info {
+/*  color:red;*/
+  border: 1rem dashed lightblue;
+  font-family: monospace;
+  font-size: 0.875rem;
+  font-style: italic;
+  display: block;
+  margin: 1rem;
+  padding: 0.625rem;
+  text-align: center;
+  
+}
+
 .post-preview > a {
   color: #212529;
 }

@@ -23,9 +23,9 @@ module.exports.contactPage = (req, res) => {
 
 module.exports.imagePredictPage = (req, res) => {
 //res.sendFile(path.resolve(__dirname,'pages/about.html'))
-	//check for 'img' param
 	let response = req.query;
-	if(typeof (req.query["img"]) != "undefined") {
+	//check for 'img' param
+	if(typeof (response["img"]) != "undefined") {
 		let stats;
 		//check if image exists on server
 		try {
@@ -34,15 +34,35 @@ module.exports.imagePredictPage = (req, res) => {
 			stats =require('fs').statSync(path);
 			//if the code after this still being run, the file exists
 			
+			const {MongoClient} = require('mongodb');
+			let uri = 'mongodb://0.0.0.0:27017/prediction_database'
+			MongoClient.connect(uri)
+					.then(async function (client) {
+						let component = {"msg":null, "predict":null};
+						console.log("connected to database");
+						let result = await client.db('prediction_database')
+							 .collection('img_classification')
+							 .findOne( { '_id':imageName } );
+						if(result === null){
+								component["msg"] = "Result is not in database (try refeshing the page or reupload the image!)"
+							} else {
+								component["predict"] = result["prediction"];
+							}
+						response = Object.assign(response, component)
+						console.log(response);
+						res.render('imagePredict',{response});
+						await client.close()
+					}).catch((err) => console.log(err) )
+					//.finally(() => this.close());
 			//AI stuffs goes here
 			///
-			let prediction = {"msg": "place holder Perdiction"}
-			response = Object.assign(response, prediction)
+			return;
 			
 		} catch(e) {
 			console.warn("Cannot access files");
+			//console.warn(e);
 			response["img"] = "../assets/img/deathbee.jpg"
-			response = Object.assign(response,{"msg": "Cannot access files"})
+			response = Object.assign(response,{ "msg": "Cannot access files","predict":null })
 			}
 	}
 	res.render('imagePredict',{response});

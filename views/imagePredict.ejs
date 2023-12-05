@@ -19,19 +19,29 @@
         </header>
         <!-- Main Content-->
         <main class="mb-4">
-        <% if (!!Object.keys(response).length) { %>
+<% if (!!Object.keys(response).length) { %>
+    <% if (response.msg !== null) { %>
         <div class="container px-4 px-lg-5">
-          <div class="row gx-4 gx-lg-5 justify-content-center">
-              <div class="col-md-10 col-lg-8 col-xl-7">
-                        <p>Buzzz Buzzz!</p>
-                        <img src="/upload/<%= encodeURIComponent(response.img) %>" style="max-width:100%">
-                        <p><%= response.msg%></p>
-                        <div class="my-5">
-                        </div>
+            <div class="row gx-4 gx-lg-5 justify-content-center">
+                <div class="col-md-10 col-lg-8 col-xl-7 info">
+                    <p><%= response["msg"] %></p>
+                </div>
+            </div>
+        </div>
+    <% } %>
+        <div class="container px-4 px-lg-5">
+            <div class="row gx-4 gx-lg-5 justify-content-center">
+                <div class="col-md-10 col-lg-8 col-xl-7">
+    <% if (response.predict !== null) { %>
+                    <p><%= response.predict %></p>
+    <% } %>
+                    <img src="/upload/<%= encodeURIComponent(response.img) %>" style="max-width:100%">
+                    <div class="my-5">
                     </div>
                 </div>
             </div>
-        <% } %>
+        </div>
+<% } %>
             <div class="container px-4 px-lg-5">
                 <div class="row gx-4 gx-lg-5 justify-content-center">
                     <div class="col-md-10 col-lg-8 col-xl-7">

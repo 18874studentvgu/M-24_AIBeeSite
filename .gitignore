@@ -1,6 +1,7 @@
 node_modules/
 public/upload/*
 *.zip
-
+venv/
+build/
 # there are other gitignore files in here
 
