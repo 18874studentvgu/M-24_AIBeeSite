@@ -5,6 +5,10 @@
 > ### Note:
 > This project assumes you have a mongodb instance running on the local machine @ port 27017
 
+### Add a pre-train model 
+
+(Look inside `ExampleModels` for more information):
+
 ### Install dependencies & run Python component:
 ```bash 
  # (optional) setup a Python virtual evironment
