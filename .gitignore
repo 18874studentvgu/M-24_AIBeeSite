@@ -3,5 +3,7 @@ public/upload/*
 *.zip
 venv/
 build/
+__pycache__
 # there are other gitignore files in here
+
 

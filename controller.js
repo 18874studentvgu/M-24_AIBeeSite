@@ -23,6 +23,11 @@ module.exports.contactPage = (req, res) => {
 
 module.exports.imagePredictPage = (req, res) => {
 //res.sendFile(path.resolve(__dirname,'pages/about.html'))
+	function sleep(ms) {
+	  return new Promise((resolve) => {
+		setTimeout(resolve, ms);
+	  });
+	}
 	let response = req.query;
 	//check for 'img' param
 	if(typeof (response["img"]) != "undefined") {
@@ -40,13 +45,17 @@ module.exports.imagePredictPage = (req, res) => {
 					.then(async function (client) {
 						let component = {"msg":null, "predict":null};
 						console.log("connected to database");
+						await sleep(1500)
 						let result = await client.db('prediction_database')
 							 .collection('img_classification')
 							 .findOne( { '_id':imageName } );
 						if(result === null){
 								component["msg"] = "Result is not in database (try refeshing the page or reupload the image!)"
 							} else {
+								let arr = (result['reportPath']).split('/');
+								let reportName = arr[arr.length-1];
 								component["predict"] = result["prediction"];
+								response["img"] = reportName
 							}
 						response = Object.assign(response, component)
 						console.log(response);
@@ -70,26 +79,32 @@ module.exports.imagePredictPage = (req, res) => {
 
 module.exports.imageUpload = (req, res) => {
 //res.sendFile(path.resolve(__dirname,'pages/about.html'))
-	let image = req.files.image;
-	mimetype = String(image.mimetype).split('/');
+	try{
+		let image = req.files.image;
+		mimetype = String(image.mimetype).split('/');
+		
+		//check if file isn't actually an image, redirect without save the file
+		if(mimetype[0] !== 'image') {
+			console.warn("File is not of an Image type");
+			throw new Error('File is not of an Image type')
+			} 
+			else {
+				let imageName = `${image.md5}.${mimetype[1]}`;
+				image.mv(require('path')
+					.resolve(__dirname, 'public/upload', imageName), 
+					function (error) {
+						let path=require('path').resolve(__dirname, 'public/upload', imageName)
+						console.log(`Image is saved @${path}`);
+						res.redirect(`/predict/photo?img=${imageName}`);
+						}) 
+			}
+	} catch (e){
+		errMess = encodeURIComponent(e)
+		res.redirect(`/predict/photo?msg=${errMess}`);
 	
-	//check if file isn't actually an image, redirect without save the file
-	if(mimetype[0] !== 'image') {
-		console.warn("File is not of an Image type");
-		res.redirect('/predict/photo');
-		} 
-		else {
-			let imageName = `${image.md5}.${mimetype[1]}`;
-			image.mv(require('path')
-				.resolve(__dirname, 'public/upload', imageName), 
-				function (error) {
-					let path=require('path').resolve(__dirname, 'public/upload', imageName)
-					console.log(`Image is saved @${path}`);
-					res.redirect(`/predict/photo?img=${imageName}`);
-					}) 
-		}
-//	res.redirect('/predict/photo');
+	}
 }
+
 
 //module.exports.productInformation_GET = (req,res) => {
 //    ProductInformation.findById((req.params.productID).trim()).exec()
