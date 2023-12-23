@@ -251,7 +251,7 @@ def cutEllipseFromImage(el, img, w, h, scale=1):
 
 model = tf.keras.models.load_model(NN_MODEL_FOLDER)
 
-model.summary()
+# model.summary()
 
 #results = model.predict_on_batch(tf.convert_to_tensor(images))
 

@@ -3819,6 +3819,9 @@ textarea.form-control-lg {
     padding: 0;
     overflow-y: visible;
   }
+  .navbar {
+    display: contents;
+  }
 }
 @media (min-width: 768px) {
   .navbar-expand-md {
@@ -3858,7 +3861,7 @@ textarea.form-control-lg {
     transition: none;
   }
   .navbar-expand-md .offcanvas .offcanvas-header {
-    display: none;
+    display: block;
   }
   .navbar-expand-md .offcanvas .offcanvas-body {
     display: flex;
@@ -3912,6 +3915,9 @@ textarea.form-control-lg {
     flex-grow: 0;
     padding: 0;
     overflow-y: visible;
+  }
+  .navbar {
+    display: flex;
   }
 }
 @media (min-width: 1200px) {

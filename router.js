@@ -17,6 +17,6 @@ router.post('/image/store',controller.imageUpload)
 
 //router.get('/productInformation/:productID',controller.productInformation_GET)
 
-
+router.get('*', controller.error);
 
 module.exports = router

@@ -7,24 +7,62 @@ matplotlib.use('agg')
 import matplotlib.pyplot as plt
 
 from predictBee import detect_and_classify_bees
-#IMG_SIZE = (300, 150)
-#CLASSES = ['Bee','Varroa','Wasp'] # the tà đạo way
-#model = tf.keras.models.load_model('SavedModel')
+print ("** Primary Prediction stuff loaded")
 
-from Object_Detection_yolo import detect
-
+try:
+    from Object_Detection_yolo import detect
+    YOLO_AVAILABLE=True
+    print ("** YOLOv7 Prediction model loaded")
+except:
+    NO_YOLO_MESSAGE = "Cannot initialized YOLOv7 component, using OpenCV object counting and circumscription instead.\n(Re-upload this image to re-run the prediction)"
+    import warnings
+    warnings.warn(NO_YOLO_MESSAGE)
+    YOLO_AVAILABLE=False
+    
 from pymongo import MongoClient
 client = MongoClient("localhost", 27017)
+print ("** Database connected")
 db = client.prediction_database
 collection = db.img_classification
-print ('\n\n ====ready!!!====')
 
 def run(fileEvent):
     print (fileEvent)
-    #predict image
-    bboxes, yolo_image, image = detect(fileEvent.src_path)
-    results = detect_and_classify_bees(image)
+    _, file_name = os.path.split(fileEvent.src_path)
     
+    try:
+        #predict image
+        if YOLO_AVAILABLE:
+            bboxes, yolo_image, image = detect(fileEvent.src_path)
+        else: 
+            # if no yolo, read image using openCV 
+            # so that detect_and_classify_bees can work
+            yolo_image = image = cv2.imread(fileEvent.src_path)
+            bboxes = {}
+        results = detect_and_classify_bees(image)
+    except KeyboardInterrupt:
+        print ("KeyboardInterrupted\n")
+        raise
+    except BaseException as e:
+        # catch that one pesky exception where an image of non-standar size is fed to the YOLOv7 model
+        # broaden to catch ANY pesky exception during the image reading + prediction period
+        import datetime
+        time = str(datetime.datetime.now())
+        img_path = os.path.join('..','upload',file_name)
+        record = {
+            "msg": f'Error @ {time}: {str(e)}\n(You found a bug! Maybe try another pic?)',
+            "prediction": '',
+            "reportPath": fileEvent.src_path,
+            "statistics": {}
+            
+        }
+        collection.update_one({'_id':file_name},{"$set":record},upsert=True)
+        import traceback
+        traceback.print_exc()
+        # print (e) # uncomment this to debug the code
+        print ("....Uh oh\n")
+        return
+    
+    #get the bee statisctics thingo
     num_bee_norm=num_bee_pollen=num_bee_varroa=num_bee_cooling=num_wasp = 0
     
     classification_keys = ['varroa', 'pollen', 'cooling', 'wasp']
@@ -49,11 +87,12 @@ def run(fileEvent):
 
     display_img = yolo_image
     for pos, _, classifications in results:
-        label = (''.join(c[0] for c in classifications)).capitalize()
+        if not(YOLO_AVAILABLE): cv2.ellipse(display_img, pos, (0, 0, 255), 2)
+        label = (''.join(c[0] for c in classifications)).upper()
         cv2.putText(display_img, label, (int(pos[0][0]), int(pos[0][1])), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 250, 255), 2)
     
 
-    # Display the image
+    # put the image on top
     somebox=top_fig.subplots(1, 1)
     somebox.imshow(cv2.cvtColor(display_img, cv2.COLOR_BGR2RGB))
     somebox.axis('off')
@@ -63,12 +102,14 @@ def run(fileEvent):
     l = lambda k: f'{stat_dict[k]}/{total_bees}' 
     table_stat = [['Bees detected','Varroa rat.','Cooling rat.','Pollen rat.','Wasp'],
                   [total_bees, l('varroa'), l('cooling'), l('pollen'), stat_dict['wasp']]]
+    # some stat as a table at the middle
     ax_table =  midd_fig.add_subplot(111)
     table = ax_table.table(table_stat, cellLoc='center', loc='center')
     table.scale(1, 2)
     ax_table.axis("off")
     ax_table.set_title("Statistics")
     
+    # add some tables and stuff at the bottom
     subplot0 = bottom_fig.add_subplot(221)
     subplot0.bar(list(stat_dict.keys()),list(stat_dict.values()))
     subplot0.set_title("Overall detection")  
@@ -91,13 +132,17 @@ def run(fileEvent):
     subplot3.set_title("R da bee dying?")
 
     #save the report
-    file_name = (fileEvent.src_path).split("/")[-1]
-    file_path = os.path.join('public','output',file_name + '.svg')
-    plt.savefig(file_path)
+    report_path = os.path.join('public','output',file_name + '.svg')
+    plt.savefig(report_path)
     
+    messages = None if YOLO_AVAILABLE else NO_YOLO_MESSAGE
+    #TODO: find someways to make it scaleable incase of more message were to be added
+    #
     record = {
+        "msg": messages,
         "prediction": '',
-        "reportPath": file_path
+        "reportPath": report_path,
+        "statistics": stat_dict
         
     }
     collection.update_one({'_id':file_name},{"$set":record},upsert=True)

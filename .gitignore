@@ -4,6 +4,8 @@ public/upload/*
 venv/
 build/
 __pycache__
+# YOLO crap
+traced_model.pt
 # there are other gitignore files in here
 
 
