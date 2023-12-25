@@ -59,8 +59,15 @@ Access the web server at localhost:5000 in a web browser
 
 ...that should be it.
 
+## Website user guide:
+![howto.webp](./public/assets/img/howto.webp "User guide")
 
-TODO: 
+## Credits:
+* AI prediction code from [WataNekko](https://github.com/WataNekko) and [TNDC2002](https://github.com/TNDC2002) (my teamates)
+* Website template from [Start Bootstrap](https://startbootstrap.com/theme/clean-blog)
+
+
+## TODO: 
 * npm start scripts
 * The YOLO model's waaay to heavy, gotta find a way to better package it
 * Improve error handling when feeding yolov7 model weird images
